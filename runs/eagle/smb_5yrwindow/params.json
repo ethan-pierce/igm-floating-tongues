@@ -15,5 +15,6 @@
   "time_end": 2019.0,
   "time_save": 1,
   "plt2d_live": true,
-  "iflo_init_slidingco": 0.25
+  "iflo_init_slidingco": 0.25,
+  "oggm_RGI_version" : 6
 }
