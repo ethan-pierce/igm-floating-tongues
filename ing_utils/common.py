@@ -1714,7 +1714,7 @@ def get_extent(var):
 
 
 class AnalysisObject():
-    def __init__(self, path, subvar=['HGT', 'surfMB', 'SNOWFALL', 'Q'],
+    def __init__(self, path, subvar=['HGT', 'surfMB', 'SNOWFALL'],
                  crs='EPSG:32608', monthday='10-01', time_var='time',
                  region='01', version='62', **kwargs):
         self.crs = crs
@@ -1724,6 +1724,43 @@ class AnalysisObject():
     
     
     def get_glaciermask(self, rgiid):
+        '''
+        Filters AnalysisObject.gpd_region containing all glaciers within a
+        region to a specific glacier, selected by the given RGIId.
+
+        Parameters
+        ----------
+        rgiid : str
+            RGI Id of chosen glacier, corresponding to the RGI version code
+            you're using (only applicable to v '62', '70G', or '70C').
+
+        Returns
+        -------
+        glaciermask : geopandas.GeoDataFrame
+            Glacier of choice based on RGIId, reprojected to match chosen CRS.
+        
+        Examples
+        --------
+        # import library
+        import ing_utils as ing
+        
+        # Create path
+        path = 'cosipy_output_CFSR_JIF_1980_2019.nc'
+        
+        # Initialize AnalysisObject
+        ao = ing.AnalysisObject(path)
+        
+        # Define rgiid's for Gilkey and Mendenhall glaciers
+        gilkey_rgi = 'RGI60-01.00704'
+        mendenhall_rgi = 'RGI60-01.00709'
+        
+        # Get masks as GeoDataFrame objects for Gilkey and Mendenhall:
+        gilkey_mask = ao.get_glaciermask(gilkey_rgi)
+        mendenhall_mask = ing.get_glaciermask(mendenhall_rgi)
+        
+        print(gilkey_mask)
+        print(mendenhall_mask)
+        '''
         print('Deriving glaciermask for rgiid: ' + rgiid)
         # Extract the Glacier based on the input RGIId:
         glaciermask = self.gpd_region[self.gpd_region['RGIId'] == rgiid]
@@ -1733,6 +1770,50 @@ class AnalysisObject():
         return glaciermask
     
     def mask_var_by_glacier(self, rgiid, all_touched=True):
+        '''
+        Mask AnalysisObject.var to an RGI outline of a glacier 'glaciermask'.
+
+        Parameters
+        ----------            
+        rgiid : str, optional
+            RGI Id of chosen glacier. Must be provided if glaciermask is None.
+            
+            The default is None.
+        
+        all_touched : bool, optional
+            If True, pixels overlapping with glaciermask polygon are included when
+            var is clipped. If False, only pixels within bounds of glaciermask are
+            saved.
+
+        Returns
+        -------
+        glacier : xarray.core.dataarray.DataArray or xarray.core.dataset.Dataset
+            Original variable(s), now with data masked to chosen glacier.
+        
+        
+        Examples
+        --------
+        # import library
+        import ing_utils as ing
+
+        # define path to .nc file:
+        path = 'cosipy_output_CFSR_JIF_1980_2019.nc'
+        
+        # Initialize AnalysisObject
+        ao = ing.AnalysisObject(path)
+        
+        # Define rgiid's for Gilkey and Mendenhall glaciers
+        gilkey_rgi = 'RGI60-01.00704'
+        mendenhall_rgi = 'RGI60-01.00709'
+        
+        # Mask AnalysisObjects to RGI Id's!
+        gilkey = ao.mask_var_by_glacier(gilkey_rgi)
+        mendenhall = ao.mask_var_by_glacier(mendenhall_rgi)
+        
+        print(gilkey)
+        print(mendenhall)
+        
+        '''
         # Clip var to glaciermask geometry using the glaciermask crs:
         glaciermask = self.get_glaciermask(rgiid)
         print('Subsetting var to glacier outline...')
