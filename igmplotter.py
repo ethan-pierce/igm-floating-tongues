@@ -303,8 +303,6 @@ class IGMPlotter():
             ']'
         ),
                             ax=ax)
-        ax.set_xlabel('Eastings [m]')
-        ax.set_ylabel('Northings [m]')
         #plt.show()
         
         return ax, cbar
@@ -378,7 +376,9 @@ class IGMPlotter():
                                       vmin=vrange[0], vmax=vrange[1],
                                       cmap=cmap, **kwargs)
             ax.set_title('%d'%(self.time[i]))
-            
+            ax.set_xlabel('Eastings [m]')
+            ax.set_ylabel('Northings [m]')
+
             # grab state of figure
             writer.grab_frame()
             
